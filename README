@@ -1,0 +1,9 @@
+install mongodb;
+
+run with admin auth:
+mongo -u admin -p password --authenticationDatabase=admin
+
+In the mongo command line create a new database and an authenticated user for it like:
+
+use prices
+db.createUser( { user: "psprices", pwd: "psprices", roles: [ { role: "readWrite", db: "psprices" }, { role: "clusterMonitor", db: "admin" } ] } )
