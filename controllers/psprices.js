@@ -1,5 +1,7 @@
 const fetch = require('node-fetch');
 const getDb = require('../util/database').getDb;
+const util = require('util');
+
 
 require('dotenv').config();
 
@@ -11,24 +13,22 @@ exports.fetchData = (req, res) => {
         .then(json => {
             count = json.count;
             page = json.next;
-            console.log(page);
+            max = Math.ceil(count / 20);
+            console.log(max);
             return saveOnePage(json.results);
         })
-        .then(() => {
-            for (let i = 0; i < Math.ceil(count / 20); i++) {
-                async function getPage() {
-                    let response = await fetch(page);
-                    let json = await response.json();
-                    page = json.next;
-                    await saveOnePage(json.results);
-                    return console.log(page);
-                }
+        .then(async function()  {
+            for (let i = 0; i < max; i++) {
+               await fetch(page).then(res => res.json())
+                    .then(json => {
+                        page = json.next;
+                        console.log(page);
+                        return saveOnePage(json.results);
+                    })
             }
         })
-        .then(() => res.send('Done'))
         .catch(err => res.send(err));
 }
-
 
 exports.filterRegion = (req, res) => {
 
@@ -38,9 +38,9 @@ exports.filterPlatforms = (req, res) => {
 
 }
 
-const saveOnePage = deals => {
+async function saveOnePage(deals) {
     const db = getDb();
     for (let deal of deals) {
-        db.collection('deals').insertOne(deal);
+        await db.collection('deals').insertOne(deal);
     }
 }
