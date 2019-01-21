@@ -7,3 +7,8 @@ In the mongo command line create a new database and an authenticated user for it
 
 use prices
 db.createUser( { user: "psprices", pwd: "psprices", roles: [ { role: "readWrite", db: "psprices" }, { role: "clusterMonitor", db: "admin" } ] } )
+
+
+api endpoint:
+
+/fetch    get all deals now (Beware throttle and better to add more timeout yourself)
