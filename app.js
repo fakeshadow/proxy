@@ -2,8 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
-const mongoConnect = require('./util/database').mongoConnect;
+const mongoose = require('mongoose');
+const schedule = require('./util/schedule');
 
 const priceRouter = require('./routes/prices');
 const errorController = require('./controllers/error');
@@ -14,13 +14,18 @@ const app = express();
 
 app.use(morgan('tiny'));
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(priceRouter);
 
 app.use(errorController.get404);
 
-mongoConnect(() => {
-    app.listen(process.env.PORT || 3000, () => console.log('Listening on port: ', process.env.PORT || 3000));
-})
+mongoose
+    .connect(process.env.DATABASE, { useNewUrlParser: true })
+    .then(res => {
+        schedule.scheduleJob();
+        app.listen(process.env.PORT || 3000, () => console.log('Listening on port: ', process.env.PORT || 3000))
+    })
+    .catch(err => console.log(err))
+
 

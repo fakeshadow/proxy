@@ -6,8 +6,10 @@ const router = express.Router();
 
 router.get('/fetch', pspricesController.fetchData);
 
-router.get('/reigon/:id', pspricesController.filterRegion);
+router.get('/prices/platforms/:id', pspricesController.filterPlatforms);
+router.get('/prices/region/:id', pspricesController.filterRegion);
 
-router.get('/platforms/:id', pspricesController.filterPlatforms);
+router.post('/price/filter', pspricesController.filterBoth);
+
 
 module.exports = router;
